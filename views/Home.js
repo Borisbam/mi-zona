@@ -12,7 +12,12 @@ const styles = StyleSheet.create({
     },
 });
 
-const Home = () => {
+const Home = ({navigation}) => {
+
+    navigation.addListener('beforeRemove', e => {
+        e.preventDefault();
+    })
+
     return (
         <>
             <View style={styles.container}>

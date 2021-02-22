@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, Button, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
 import {
     useFonts,
@@ -10,6 +11,8 @@ import {
 } from '@expo-google-fonts/balsamiq-sans';
 
 import { Entypo } from '@expo/vector-icons';
+
+
 
 const styles = StyleSheet.create({
     container: {
@@ -30,7 +33,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const Onboarding1 = () => {
+const Onboarding1 = ({ navigation }) => {
 
     let [fontsLoaded] = useFonts({
         BalsamiqSans_400Regular,
@@ -39,14 +42,40 @@ const Onboarding1 = () => {
         BalsamiqSans_700Bold_Italic,
     });
 
-    const [actualPage, setActualPage] = useState(true)
-    const [actualPage2, setActualPage2] = useState(false)
-    const [actualPage3, setActualPage3] = useState(false)
-    const [actualPage4, setActualPage4] = useState(false)
+    const [loading, setLoading] = useState(true);
+
+    const getData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('onboarding-1')
+            if (value) {
+                navigation.navigate('Onboarding-2')
+            } else {
+                setLoading(false)
+            }
+
+        } catch (e) {
+            alert('Hubo algún error')
+        }
+    }
+
+    const setData = async () => {
+        try {
+            await AsyncStorage.setItem('onboarding-1', 'true')
+        } catch (e) {
+            alert('Hubo algún error')
+        }
+    }
+
+    useEffect(() => {
+        getData()
+    }, [])
+
+    if (loading) return null;
 
     if (!fontsLoaded) {
         return <AppLoading />
     } else {
+
         return (
             <>
 
@@ -59,6 +88,7 @@ const Onboarding1 = () => {
 
 
                     <Text style={styles.title} >!Bienvenido a Mi Zona!</Text>
+
                     <View style={styles.container}>
 
                         <View >
@@ -98,6 +128,10 @@ const Onboarding1 = () => {
                                 justifyContent: 'center',
                                 display: 'flex'
                             }}
+                            onPress={() => {
+                                navigation.navigate('Onboarding-2')
+                                setData()
+                            }}
                         >
                             <Text
                                 style={{
@@ -126,12 +160,13 @@ const Onboarding1 = () => {
 
                     </View>
 
-                    <View
+                    <TouchableOpacity
                         style={{
                             display: 'flex',
                             flexDirection: 'row',
                             justifyContent: 'center'
                         }}
+                        onPress={() => navigation.navigate('Home')}
                     >
                         <Text
                             style={{
@@ -140,7 +175,7 @@ const Onboarding1 = () => {
                                 color: 'grey'
                             }}
                         >omitir intro</Text>
-                    </View>
+                    </TouchableOpacity>
 
                 </ScrollView>
 

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, Image, View, TouchableOpacity, ScrollView } from 'react-native';
 import AppLoading from 'expo-app-loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
     useFonts,
     BalsamiqSans_400Regular,
@@ -11,7 +13,12 @@ import {
 
 import { Entypo } from '@expo/vector-icons';
 
-const Onboarding2 = () => {
+const Onboarding2 = ({ navigation }) => {
+
+
+    navigation.addListener('beforeRemove', e => {
+        e.preventDefault();
+    })
 
     let [fontsLoaded] = useFonts({
         BalsamiqSans_400Regular,
@@ -20,24 +27,50 @@ const Onboarding2 = () => {
         BalsamiqSans_700Bold_Italic,
     });
 
-    const [actualPage, setActualPage] = useState(true)
-    const [actualPage2, setActualPage2] = useState(false)
-    const [actualPage3, setActualPage3] = useState(false)
-    const [actualPage4, setActualPage4] = useState(false)
+    const [loading, setLoading] = useState(true);
+
+    const getData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('onboarding-2')
+            if (value) {
+                navigation.navigate('Onboarding-3')
+            } else {
+                setLoading(false)
+            }
+
+        } catch (e) {
+            alert('Hubo algún error')
+        }
+    }
+
+    const setData = async () => {
+        try {
+            await AsyncStorage.setItem('onboarding-2', 'true')
+        } catch (e) {
+            alert('Hubo algún error')
+        }
+    }
+
+    useEffect(() => {
+        getData()
+    }, [])
+
+    if (loading) return null;
 
     if (!fontsLoaded) {
         return <AppLoading />
     } else {
         return (
-            <ScrollView>
+            <ScrollView style={{ backgroundColor: 'white' }}>
                 <View
                     style={{
                         display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        marginTop: -60
                     }}
                 >
-                    <Image source={require('../assets/page-2.jpg')} />
+                    <Image source={require('../assets/page-2.jpg')} style={{}} />
                 </View>
 
                 <View>
@@ -71,10 +104,14 @@ const Onboarding2 = () => {
                             justifyContent: 'center',
                             display: 'flex'
                         }}
+                        onPress={() => {
+                            navigation.navigate('Onboarding-3')
+                            setData()
+                        }}
                     >
                         <Text
                             style={{
-                                backgroundColor: 'yellow',
+                                backgroundColor: '#DEDC88',
                                 paddingVertical: 10,
                                 paddingHorizontal: 50,
                                 marginVertical: 20,
@@ -91,8 +128,7 @@ const Onboarding2 = () => {
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: 'center',
-                        backgroundColor: 'white',
-                        paddingVertical: 30
+                        backgroundColor: 'white'
                     }}
                 >
                     <Entypo name="controller-record" size={12} color="#D7D7D7" style={{ marginEnd: 10 }} />
